@@ -54,7 +54,7 @@ namespace BrainFuckInterpreterLib
                     var eventArgs = new BreakPointHitEventArgs(programState);
                     BreakPointHit?.Invoke(this, eventArgs);
 
-                    while (eventArgs.State == BreakPointHitEventArgs.BreakState.Break) ;
+                    //while (eventArgs.State == BreakPointHitEventArgs.BreakState.Break) ;
                     paused = eventArgs.State == BreakPointHitEventArgs.BreakState.Step;
                 }
 

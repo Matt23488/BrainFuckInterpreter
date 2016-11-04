@@ -9,7 +9,7 @@ namespace BrainFuckInterpreterLib
     public delegate void BreakPointHitEventHandler(object sender, BreakPointHitEventArgs e);
     public class BreakPointHitEventArgs : EventArgs
     {
-        internal BreakState State { get; set; } = BreakState.Break;
+        internal BreakState State { get; set; } = BreakState.Continue;
 
         public DebuggerState ProgramState { get; }
 
@@ -30,7 +30,7 @@ namespace BrainFuckInterpreterLib
 
         internal enum BreakState
         {
-            Break,
+            //Break,
             Step,
             Continue
         }
