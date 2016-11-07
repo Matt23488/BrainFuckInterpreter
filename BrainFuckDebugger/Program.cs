@@ -1,4 +1,5 @@
-﻿using BrainFuckDebugger.Utilities;
+﻿using BrainFuckDebugger.Extensions;
+using BrainFuckDebugger.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,41 +18,21 @@ namespace BrainFuckDebugger
                 return;
             }
 
+            Console.BufferWidth = 1000;
+
             var debugger = new DebuggerInvoker(args);
 
             int position = 0;
             ConsoleKeyInfo keyPressed;
             do
             {
-                Console.Clear();
-                Console.SetCursorPosition(0, 0);
-                ConsoleHelper.ClearLinesAndReturnCursor(0, 0, 7);
-                Console.WriteLine(debugger);
-                DrawPointerLine(position);
-                Console.WriteLine();
-                Console.WriteLine("Press Left or Right to move the cursor.");
-                Console.WriteLine("Press F9 to set a break point.");
-                Console.WriteLine("Press F5 to start debugging.");
-
-                do
-                {
-                    keyPressed = Console.ReadKey();
-                } while (keyPressed.Key != ConsoleKey.LeftArrow && keyPressed.Key != ConsoleKey.RightArrow && keyPressed.Key != ConsoleKey.F9 && keyPressed.Key != ConsoleKey.F5);
-
-                switch (keyPressed.Key)
-                {
-                    case ConsoleKey.LeftArrow:
-                        if (position > 0) position--;
-                        break;
-                    case ConsoleKey.RightArrow:
-                        if (position < Console.BufferWidth) position++;
-                        break;
-                    case ConsoleKey.F9:
-                        debugger.ToggleBreakPoint(position);
-                        break;
-                }
+                PrintPreDebuggingOptions(debugger, ref position);
+                GetPreDebuggingKey(out keyPressed);
+                PerformPreDebuggingAction(debugger, keyPressed, ref position);
 
             } while (keyPressed.Key != ConsoleKey.F5);
+
+            Console.Clear();
 
             Console.SetCursorPosition(0, 0);
             ConsoleHelper.ClearLinesAndReturnCursor(0, 0, 10);
@@ -74,6 +55,43 @@ namespace BrainFuckDebugger
             for (int i = 0; i < Console.BufferWidth; i++)
             {
                 Console.Write(i == position ? '^' : ' ');
+            }
+        }
+
+        private static void PrintPreDebuggingOptions(DebuggerInvoker debugger, ref int position)
+        {
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            ConsoleHelper.ClearLinesAndReturnCursor(0, 0, 7);
+            Console.WriteLine(debugger);
+            DrawPointerLine(position);
+            Console.WriteLine();
+            Console.WriteLine("Press Left or Right to move the cursor.");
+            Console.WriteLine("Press F9 to set a break point.");
+            Console.WriteLine("Press F5 to start debugging.");
+        }
+
+        private static void GetPreDebuggingKey(out ConsoleKeyInfo keyPressed)
+        {
+            do
+            {
+                keyPressed = Console.ReadKey();
+            } while (!keyPressed.IsValidPreDebuggingKey());
+        }
+
+        private static void PerformPreDebuggingAction(DebuggerInvoker debugger, ConsoleKeyInfo keyPressed, ref int position)
+        {
+            switch (keyPressed.Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    if (position > 0) position--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (position < Console.BufferWidth) position++;
+                    break;
+                case ConsoleKey.F9:
+                    debugger.ToggleBreakPoint(position);
+                    break;
             }
         }
     }

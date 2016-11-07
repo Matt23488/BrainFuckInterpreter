@@ -30,7 +30,6 @@ namespace BrainFuckInterpreterLib
 
         internal enum BreakState
         {
-            //Break,
             Step,
             Continue
         }
