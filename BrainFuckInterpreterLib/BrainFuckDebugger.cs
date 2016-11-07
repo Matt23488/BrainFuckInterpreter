@@ -14,10 +14,7 @@ namespace BrainFuckInterpreterLib
 
         public IEnumerable<int> BreakPoints
         {
-            get
-            {
-                foreach (var position in _breakPoints) yield return position;
-            }
+            get { return _breakPoints.AsEnumerable(); }
         }
 
         public event BreakPointHitEventHandler BreakPointHit;
@@ -31,8 +28,8 @@ namespace BrainFuckInterpreterLib
 
         public void ToggleBreakPoint(int position)
         {
-            if (!_breakPoints.Contains(position)) _breakPoints.Add(position);
-            else _breakPoints.Remove(position);
+            if (_breakPoints.Contains(position)) _breakPoints.Remove(position);
+            else                                 _breakPoints.Add(position);
         }
 
         public void Start()
