@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="DebuggerInvoker.cs" />
     <Compile Include="Extensions\ConsoleKeyInfoExtensions.cs" />
+    <Compile Include="Extensions\IntegerExtensions.cs" />
+    <Compile Include="Extensions\ProgramStateExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ConsoleHelper.cs" />

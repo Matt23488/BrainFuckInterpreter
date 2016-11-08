@@ -42,17 +42,17 @@
   <ItemGroup>
     <Compile Include="BrainFuckDebugger.cs" />
     <Compile Include="BreakPointHitEventArgs.cs" />
+    <Compile Include="StepAction.cs" />
     <Compile Include="CellSize.cs" />
-    <Compile Include="DebuggerState.cs" />
-    <Compile Include="Extensions\IntegerExtensions.cs" />
     <Compile Include="BrainFuckInterpreter.cs" />
-    <Compile Include="InterpreterSettings.cs" />
-    <Compile Include="InterpreterState.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="BrainFuckSettings.cs" />
     <Compile Include="ProgramState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyntaxError.cs" />
     <Compile Include="SyntaxException.cs" />
-    <Compile Include="Utilities\ConsoleHelper.cs" />
+    <Compile Include="Utilities\BrainFuckReader.cs" />
+    <Compile Include="Utilities\BrainFuckWriter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -9,29 +9,13 @@ namespace BrainFuckInterpreterLib
     public delegate void BreakPointHitEventHandler(object sender, BreakPointHitEventArgs e);
     public class BreakPointHitEventArgs : EventArgs
     {
-        internal BreakState State { get; set; } = BreakState.Continue;
+        public StepAction Action { get; set; } = StepAction.Continue;
 
-        public DebuggerState ProgramState { get; }
+        public ProgramState ProgramState { get; }
 
-        public BreakPointHitEventArgs(DebuggerState programState)
+        public BreakPointHitEventArgs(ProgramState programState)
         {
             ProgramState = programState;
-        }
-
-        public void Continue()
-        {
-            State = BreakState.Continue;
-        }
-
-        public void Step()
-        {
-            State = BreakState.Step;
-        }
-
-        internal enum BreakState
-        {
-            Step,
-            Continue
         }
     }
 }

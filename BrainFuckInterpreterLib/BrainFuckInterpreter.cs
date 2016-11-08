@@ -1,81 +1,78 @@
-﻿using System;
+﻿using BrainFuckInterpreterLib.Extensions;
+using BrainFuckInterpreterLib.Utilities;
+using System;
 using System.IO;
+using System.Linq;
 
 namespace BrainFuckInterpreterLib
 {
     public sealed class BrainFuckInterpreter
     {
-        private readonly TextWriter _writer;
-        private readonly TextReader _reader;
+        private readonly BrainFuckWriter _writer;
+        private readonly BrainFuckReader _reader;
 
-        internal readonly ProgramState ProgramState;
-        internal readonly InterpreterState InterpreterState;
-        internal string Code;
+        private bool _syntaxChecked;
 
-        internal bool EndOfProgramReached => InterpreterState.CurrentIndex > Code.Length;
+        public ProgramState State { get; private set; }
 
-        public BrainFuckInterpreter(string code) : this(code, InterpreterSettings.Default) { }
-        public BrainFuckInterpreter(string code, InterpreterSettings settings)
+        public string Code { get; internal set; }
+
+        public bool EndOfProgramReached => State.CurrentCodePosition > Code.Length;
+
+        public BrainFuckInterpreter(string code) : this(code, BrainFuckSettings.Default) { }
+        public BrainFuckInterpreter(string code, BrainFuckSettings settings)
         {
-            _writer = settings.Writer;
-            _reader = settings.Reader;
-            ProgramState = new ProgramState(settings.CellSize);
-            InterpreterState = new InterpreterState();
+            _writer = new BrainFuckWriter(settings.Writer);
+            _reader = new BrainFuckReader(settings.Reader);
+            _syntaxChecked = false;
+            State = new ProgramState(settings.CellSize);
             Code = code;
-        }
-
-        public void VerifySyntaxIntegrity()
-        {
-            int position;
-            SyntaxError error = HasValidSyntax(Code, out position);
-            if (error != SyntaxError.None)
-            {
-                throw new SyntaxException(error, position);
-            }
         }
 
         public void Advance()
         {
-            if (InterpreterState.CurrentIndex == Code.Length)
+            VerifySyntaxIntegrity();
+
+            if (State.CurrentCodePosition == Code.Length)
             {
-                InterpreterState.CurrentIndex++;
+                State.IncrementCodePosition();
                 return;
             }
 
-            switch (Code[InterpreterState.CurrentIndex])
+            switch (Code[State.CurrentCodePosition])
             {
                 case '<':
-                    ProgramState.ShiftLeft();
+                    State.ShiftLeft();
                     break;
                 case '>':
-                    ProgramState.ShiftRight();
+                    State.ShiftRight();
                     break;
                 case '+':
-                    ProgramState.Increment();
+                    State.IncrementCellValue();
                     break;
                 case '-':
-                    ProgramState.Decrement();
+                    State.DecrementCellValue();
                     break;
                 case '[':
-                    HandleOpenSquareBrace(Code);
+                    HandleLoopConditionCheck();
                     break;
                 case ']':
-                    InterpreterState.Loop();
+                    State.Loop();
                     break;
                 case '.':
-                    _writer.Write(ProgramState.CurrentValue == 10 ? Environment.NewLine : ((char)ProgramState.CurrentValue).ToString());
+                    _writer.Write(State.CurrentValue);
                     break;
                 case ',':
-                    ProgramState.ReadInput(_reader);
+                    State.CurrentValue = _reader.Read();
                     break;
             }
 
-            InterpreterState.CurrentIndex++;
+            State.IncrementCodePosition();
         }
 
         public void RunToPosition(int position)
         {
-            while (InterpreterState.CurrentIndex < position)
+            while (State.CurrentCodePosition < position)
             {
                 Advance();
             }
@@ -86,53 +83,69 @@ namespace BrainFuckInterpreterLib
             RunToPosition(Code.Length);
         }
 
-        private SyntaxError HasValidSyntax(string program, out int position)
+        internal void VerifySyntaxIntegrity()
         {
-            position = program.Length;
-
-            int level = 0;
-
-            for (int i = 0; i < program.Length; i++)
+            // TODO: This will have to be changed once debugging is added again.
+            // If we allow on-the-fly code changes, we will have to clear the flag.
+            if (!_syntaxChecked)
             {
-                switch (program[i])
+                int position;
+                var error = HasValidSyntax(out position);
+                if (error != SyntaxError.None)
+                {
+                    throw new SyntaxException(error, position);
+                }
+                _syntaxChecked = true;
+            }
+        }
+
+        private SyntaxError HasValidSyntax(out int position)
+        {
+            position = Code.Length;
+
+            int nestedLoopLevel = 0;
+
+            for (int i = 0; i < Code.Length; i++)
+            {
+                switch (Code[i])
                 {
                     case '[':
-                        level++;
+                        nestedLoopLevel++;
                         break;
                     case ']':
-                        if (level == 0)
+                        if (nestedLoopLevel == 0)
                         {
                             position = i;
                             return SyntaxError.UnexpectedClosingSquareBrace;
                         }
-                        level--;
+                        nestedLoopLevel--;
                         break;
                 }
             }
 
-            if (level != 0) return SyntaxError.UnbalancedSquareBraces;
-            else return SyntaxError.None;
+            if (nestedLoopLevel != 0) return SyntaxError.UnbalancedSquareBraces;
+            else                      return SyntaxError.None;
         }
 
-        private void HandleOpenSquareBrace(string program)
+        private void HandleLoopConditionCheck()
         {
-            if (ProgramState.CurrentValue == 0)
+            if (State.CurrentValue == 0)
             {
-                int squareBraceCount = 1;
-                while (squareBraceCount > 0)
+                int nestedLoopLevel = 1;
+                while (nestedLoopLevel > 0)
                 {
-                    InterpreterState.CurrentIndex++;
+                    State.IncrementCodePosition();
 
-                    switch (program[InterpreterState.CurrentIndex])
+                    switch (Code[State.CurrentCodePosition])
                     {
-                        case '[': squareBraceCount++; break;
-                        case ']': squareBraceCount--; break;
+                        case '[': nestedLoopLevel++; break;
+                        case ']': nestedLoopLevel--; break;
                     }
                 }
             }
             else
             {
-                InterpreterState.MarkLoopLocation();
+                State.MarkLoopLocation();
             }
         }
     }

@@ -17,8 +17,8 @@ BrainFuckInterpreter:
 This is basically a command line wrapper for BrainFuckInterpreterLib that provides what you'd expect for a command line
 BrainFuck interpreter to be able to do.
 
-BrainFuckInterpreterApp:
-This got committed by mistake, I forgot this project was in the solution. But basically it was a test application
+BrainFuckInterpreterApp (REMOVED):
+This got committed by mistake, I forgot this project was in the solution directory. But basically it was a test application
 for testing the API of BrainFuckInterpreterLib.dll.
 
 BrainFuckInterpreterLib:

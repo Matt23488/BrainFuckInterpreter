@@ -1,4 +1,4 @@
-﻿namespace BrainFuckInterpreterLib.Extensions
+﻿namespace BrainFuckDebugger.Extensions
 {
     internal static class IntegerExtensions
     {
@@ -22,9 +22,9 @@
             return numSpaces;
         }
 
-        public static int GetNumCharsOfSpace(this uint b)
+        public static int GetNumCharsOfSpace(this uint i)
         {
-            uint value = b;
+            uint value = i;
             int numSpaces = 1;
 
             while (value >= 10)

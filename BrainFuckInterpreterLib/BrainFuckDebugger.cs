@@ -12,16 +12,14 @@ namespace BrainFuckInterpreterLib
 
         private List<int> _breakPoints;
 
-        public IEnumerable<int> BreakPoints
-        {
-            get { return _breakPoints.AsEnumerable(); }
-        }
+        public IEnumerable<int> BreakPoints => _breakPoints.AsEnumerable();
 
         public event BreakPointHitEventHandler BreakPointHit;
 
-        public BrainFuckDebugger(BrainFuckInterpreter interpreter)
+        public BrainFuckDebugger(string code) : this(code, BrainFuckSettings.Default) { }
+        public BrainFuckDebugger(string code, BrainFuckSettings settings)
         {
-            _interpreter = interpreter;
+            _interpreter = new BrainFuckInterpreter(code, settings);
 
             _breakPoints = new List<int>();
         }
@@ -35,23 +33,16 @@ namespace BrainFuckInterpreterLib
         public void Start()
         {
             _interpreter.VerifySyntaxIntegrity();
-            
+
             bool paused = false;
             while (!_interpreter.EndOfProgramReached)
             {
-                if (paused || _breakPoints.Contains(_interpreter.InterpreterState.CurrentIndex))
+                if (paused || _breakPoints.Contains(_interpreter.State.CurrentCodePosition))
                 {
-                    var programState = new DebuggerState
-                    {
-                        CurrentExecutionLocation = _interpreter.InterpreterState.CurrentIndex,
-                        CellValues = _interpreter.ProgramState.CellValues.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-                        CellPointer = _interpreter.ProgramState.CurrentCell
-                    };
-
-                    var eventArgs = new BreakPointHitEventArgs(programState);
+                    var eventArgs = new BreakPointHitEventArgs(_interpreter.State);
                     BreakPointHit?.Invoke(this, eventArgs);
-                    
-                    paused = eventArgs.State == BreakPointHitEventArgs.BreakState.Step;
+
+                    paused = eventArgs.Action == StepAction.Step;
                 }
 
                 _interpreter.Advance();

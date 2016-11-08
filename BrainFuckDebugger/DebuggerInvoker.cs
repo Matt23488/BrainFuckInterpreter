@@ -1,4 +1,5 @@
-﻿using BrainFuckDebugger.Utilities;
+﻿using BrainFuckDebugger.Extensions;
+using BrainFuckDebugger.Utilities;
 using BrainFuckInterpreterLib;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace BrainFuckDebugger
 {
     internal class DebuggerInvoker
     {
-        private InterpreterSettings _settings = InterpreterSettings.Default;
+        private BrainFuckSettings _settings = BrainFuckSettings.Default;
         private string _code = string.Empty;
 
         private BrainFuckInterpreterLib.BrainFuckDebugger _debugger;
@@ -20,8 +21,7 @@ namespace BrainFuckDebugger
         {
             ParseArguments(args);
 
-            var interpreter = new BrainFuckInterpreterLib.BrainFuckInterpreter(_code);
-            _debugger = new BrainFuckInterpreterLib.BrainFuckDebugger(interpreter);
+            _debugger = new BrainFuckInterpreterLib.BrainFuckDebugger(_code, _settings);
             _debugger.BreakPointHit += BreakPointHit;
         }
 
@@ -76,15 +76,6 @@ namespace BrainFuckDebugger
             }
         }
 
-        //public void SetBreakPoint(int position)
-        //{
-        //    _debugger.AddBreakPoint(position);
-        //}
-
-        //public void RemoveBreakPoint(int position)
-        //{
-        //    _debugger.RemoveBreakPoint(position);
-        //}
         public void ToggleBreakPoint(int position)
         {
             _debugger.ToggleBreakPoint(position);
@@ -115,7 +106,7 @@ namespace BrainFuckDebugger
 
             Console.SetCursorPosition(0, 0);
 
-            Console.WriteLine(e.ProgramState);
+            Console.WriteLine(e.ProgramState.GetCellStateString());
             Console.WriteLine();
             Console.Write("Press F5 to continue or F10 to step forward one instruction: ");
 
@@ -127,8 +118,8 @@ namespace BrainFuckDebugger
 
             Console.SetCursorPosition(left, top);
 
-            if (keyPressed.Key == ConsoleKey.F5) e.Continue();
-            else e.Step();
+            if (keyPressed.Key == ConsoleKey.F5) e.Action = StepAction.Continue;
+            else                                 e.Action = StepAction.Step;
         }
 
         public override string ToString()

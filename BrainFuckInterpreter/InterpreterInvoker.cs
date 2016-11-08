@@ -6,7 +6,7 @@ namespace BrainFuckInterpreter
 {
     internal class InterpreterInvoker
     {
-        private InterpreterSettings _settings = InterpreterSettings.Default;
+        private BrainFuckSettings _settings = BrainFuckSettings.Default;
         private string _code = string.Empty;
 
         public void ParseArguments(params string[] args)
@@ -63,7 +63,6 @@ namespace BrainFuckInterpreter
         public void RunProgram()
         {
             var interpreter = new BrainFuckInterpreterLib.BrainFuckInterpreter(_code);
-            interpreter.VerifySyntaxIntegrity();
             interpreter.RunToCompletion();
         }
     }
