@@ -16,9 +16,9 @@ namespace BrainFuckInterpreterLib
 
         public IEnumerable<KeyValuePair<int, uint>> Cells => _cellValues.AsEnumerable();
 
-        public int CurrentCodePosition { get; private set; };
+        public int CurrentCodePosition { get; private set; }
 
-        public int CurrentCell { get; private set; };
+        public int CurrentCell { get; private set; }
         public uint CurrentValue
         {
             get { return _cellValues[CurrentCell]; }
